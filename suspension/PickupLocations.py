@@ -1,6 +1,6 @@
 from sympy import *
 import numpy as np
-from math import sqrt
+from math import sqrt, ceil, pi, atan, sin, cos
 
 class PickupLocations:
 
@@ -28,10 +28,67 @@ class PickupLocations:
 
         sol = np.linalg.solve(A,b)
 
-        Point_Rotation = [sol[0].tolist()[0][0], sol[1].tolist()[0][0], sol[2].tolist()[0][0]]
-        Radius = sqrt((Point_Rotation[0] - self.sphericalHolder.get_x())**2 + (Point_Rotation[1] - self.sphericalHolder.get_y())**2 + (Point_Rotation[2] - self.sphericalHolder.get_z())**2)
-        print(Radius)
-        pass
+        pointRotation = [sol[0].tolist()[0][0], sol[1].tolist()[0][0], sol[2].tolist()[0][0]]
+        radius = sqrt((pointRotation[0] - self.sphericalHolder.get_x())**2 + (pointRotation[1] - self.sphericalHolder.get_y())**2 + (pointRotation[2] - self.sphericalHolder.get_z())**2)
+        
+        origin = [self.frontChassis.get_x(), self.frontChassis.get_y(), self.frontChassis.get_z()]
+        sphericalOrigin = [self.sphericalHolder.get_x(), self.sphericalHolder.get_y(), self.sphericalHolder.get_z()]
+
+        BasePointOne = np.subtract(pointRotation, origin)
+        BasePointTwo = np.subtract(sphericalOrigin, origin)
+
+        # Rotation Angle about Z Axis
+        gamma = 2*pi - atan(BasePointOne[1]/BasePointOne[0])
+
+        
+        
+        for i in range(1, int((max-min)/interval + 1)+1):
+            theta = (min + (i*interval))*pi/180
+
+            # Translate Point 1 to Origin(T)
+            pointOne = BasePointOne
+            pointTwo = BasePointTwo
+            
+            # Rotate Point 2 onto X axis
+            Rz = np.matrix([
+                [cos(gamma), -sin(gamma), 0],
+                [sin(gamma), cos(gamma), 0],
+                [0, 0, 1]
+            ])
+            pointOne = np.dot(Rz, np.array(pointOne)).transpose()
+            pointTwo = np.dot(Rz, np.array(pointTwo)).transpose()
+
+            # Rotation Angle about Y Axis
+            beta = atan(pointOne[2]/pointOne[0])
+            
+            Ry = np.matrix([
+                [cos(beta), 0, sin(beta)],
+                [0, 1, 0],
+                [-sin(beta), 0, cos(beta)]
+            ])
+            pointOne = np.dot(Ry, pointOne)
+            pointTwo = np.dot(Ry, pointTwo)
+
+            # Rotate Around X Axis
+            Rx = np.matrix([
+                [1, 0, 0],
+                [0, cos(theta), -sin(theta)],
+                [0, sin(theta), cos(theta)]
+            ])
+            pointOne = np.dot(Rx, pointOne)
+            pointTwo = np.dot(Rx, pointTwo)
+
+            # Rotate to Original Orientation
+            pointOne = np.dot(Ry**-1, pointOne)
+            pointTwo = np.dot(Ry**-1, pointTwo)
+            
+            pointOne = np.dot(Rz**-1, pointOne)
+            pointTwo = np.dot(Rz**-1, pointTwo)
+
+            # Translate to Original Position
+            pointOne = np.vstack(np.diag(np.add(pointOne, origin)))
+            pointTwo = np.vstack(np.diag(np.add(pointTwo, origin)))
+
 
     def calc_SH(self, interval, min, max):
         self.calculate_spherical_holders(interval, min, max)
