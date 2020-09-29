@@ -1,5 +1,6 @@
 from sympy import *
 import numpy as np
+from math import sqrt
 
 class PickupLocations:
 
@@ -26,13 +27,10 @@ class PickupLocations:
         ]))
 
         sol = np.linalg.solve(A,b)
-        x = sol[0].tolist()[0][0]
-        y = sol[1].tolist()[0][0]
-        z = sol[2].tolist()[0][0]
 
-        print(x)
-        print(y)
-        print(z)
+        Point_Rotation = [sol[0].tolist()[0][0], sol[1].tolist()[0][0], sol[2].tolist()[0][0]]
+        Radius = sqrt((Point_Rotation[0] - self.sphericalHolder.get_x())**2 + (Point_Rotation[1] - self.sphericalHolder.get_y())**2 + (Point_Rotation[2] - self.sphericalHolder.get_z())**2)
+        print(Radius)
         pass
 
     def calc_SH(self, interval, min, max):
