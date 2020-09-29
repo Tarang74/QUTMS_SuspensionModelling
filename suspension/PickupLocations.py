@@ -1,6 +1,7 @@
 from sympy import *
 import numpy as np
 from math import sqrt, ceil, pi, atan, sin, cos
+import itertools
 
 class PickupLocations:
 
@@ -40,7 +41,7 @@ class PickupLocations:
         # Rotation Angle about Z Axis
         gamma = 2*pi - atan(BasePointOne[1]/BasePointOne[0])
 
-        
+        self.sphericalHolderCoords = []
         
         for i in range(1, int((max-min)/interval + 1)+1):
             theta = (min + (i*interval))*pi/180
@@ -88,7 +89,12 @@ class PickupLocations:
             # Translate to Original Position
             pointOne = np.vstack(np.diag(np.add(pointOne, origin)))
             pointTwo = np.vstack(np.diag(np.add(pointTwo, origin)))
-
+            
+            condensedTwo = list(itertools.chain(*pointTwo.tolist()))
+            self.sphericalHolderCoords.append(condensedTwo)
+            MAG = [self.sphericalHolderCoords[-1][0] - pointRotation[0], self.sphericalHolderCoords[-1][1] - pointRotation[1], self.sphericalHolderCoords[-1][2] - pointRotation[2]]
+            MAG = sum([x**2 for x in MAG])**(1/2)
+            
 
     def calc_SH(self, interval, min, max):
         self.calculate_spherical_holders(interval, min, max)
