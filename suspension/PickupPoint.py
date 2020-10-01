@@ -1,10 +1,16 @@
 class PickupPoint:
+    """
+    Stores x, y and z coordinates of a suspension pickup point
+    """
 
     def __init__(self, x, y, z, alias='point'):
         self.x = x
         self.y = y
         self.z = z
         self.alias = alias
+
+    def get_point(self):
+        return [self.x, self.y, self.z]
 
     def set_x(self, x):
         self.x = x

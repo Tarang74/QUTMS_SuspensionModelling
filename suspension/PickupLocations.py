@@ -1,50 +1,70 @@
-from sympy import *
 import numpy as np
 from math import sqrt, ceil, pi, atan, sin, cos
 import itertools
 
 class PickupLocations:
-
-    def __init__(self, frontChassis, rearChassis, sphericalHolder, position):
+    """
+    Stores pickup points of an A-Arm
+    """
+    def __init__(self, frontChassis, rearChassis, staticSphericalHolder, position):
         self.frontChassis = frontChassis
         self.rearChassis = rearChassis
-        self.sphericalHolder = sphericalHolder
+        self.staticSphericalHolder = staticSphericalHolder
+
+        self.sphericalHolderCoords = []
 
         if position == 'Top' or position == 'Bottom' or position == 'top' or position == 'bottom':
             self.position = position
         else:
-            raise Exception("Error: Position must be top or bottom")
+            raise Exception("Error: A-Arm Position must be top or bottom")
 
-    def calculate_spherical_holders(self, interval, min, max):
+    def get_staticSphericalHolder(self):
+        return self.staticSphericalHolder
+
+    def get_frontChassis(self):
+        return self.frontChassis
+
+    def get_rearChassis(self):
+        return self.rearChassis
+
+    def set_sphericalHolderCoords(self, interval, _min, _max):
+        """Returns List
+        set_sphericalHolderCoords calculates the kinematics of a single suspension
+        wishbone. set_sphericalHolderCoords(self, interval, _min, _max) evaluates the
+        position of the spherical holder with relation to the fixed pickup
+        points on the chassis. The position of the sphericalHolder is evaluated at a
+        defined interval in degrees for a set angle of rotation defined by _max and _min.
+        """
+        # Reset coords
+        self.sphericalHolderCoords = []
+
+        # Calculate Spherical Rotation
         A = np.matrix([
             [1,0,0,-(self.rearChassis.get_x()-self.frontChassis.get_x())],
             [0,1,0,-(self.rearChassis.get_y()-self.frontChassis.get_y())],
             [0,0,1,-(self.rearChassis.get_z()-self.frontChassis.get_z())],
             [(self.rearChassis.get_x()-self.frontChassis.get_x()), (self.rearChassis.get_y()-self.frontChassis.get_y()), (self.rearChassis.get_z()-self.frontChassis.get_z()), -1]
         ])
-
         b = np.transpose(np.matrix([
-            [self.frontChassis.get_x(), self.frontChassis.get_y(), self.frontChassis.get_z(), self.sphericalHolder.get_x()*(self.rearChassis.get_x()-self.frontChassis.get_x()) + self.sphericalHolder.get_y()*(self.rearChassis.get_y()-self.frontChassis.get_y()) + self.sphericalHolder.get_z()*(self.rearChassis.get_z()-self.frontChassis.get_z()) ]
+            [self.frontChassis.get_x(), self.frontChassis.get_y(), self.frontChassis.get_z(), self.staticSphericalHolder.get_x()*(self.rearChassis.get_x()-self.frontChassis.get_x()) + self.staticSphericalHolder.get_y()*(self.rearChassis.get_y()-self.frontChassis.get_y()) + self.staticSphericalHolder.get_z()*(self.rearChassis.get_z()-self.frontChassis.get_z()) ]
         ]))
-
         sol = np.linalg.solve(A,b)
 
+        # Calculate constants for iteration
         pointRotation = [sol[0].tolist()[0][0], sol[1].tolist()[0][0], sol[2].tolist()[0][0]]
-        radius = sqrt((pointRotation[0] - self.sphericalHolder.get_x())**2 + (pointRotation[1] - self.sphericalHolder.get_y())**2 + (pointRotation[2] - self.sphericalHolder.get_z())**2)
+        radius = sqrt((pointRotation[0] - self.staticSphericalHolder.get_x())**2 + (pointRotation[1] - self.staticSphericalHolder.get_y())**2 + (pointRotation[2] - self.staticSphericalHolder.get_z())**2)
         
         origin = [self.frontChassis.get_x(), self.frontChassis.get_y(), self.frontChassis.get_z()]
-        sphericalOrigin = [self.sphericalHolder.get_x(), self.sphericalHolder.get_y(), self.sphericalHolder.get_z()]
+        sphericalOrigin = [self.staticSphericalHolder.get_x(), self.staticSphericalHolder.get_y(), self.staticSphericalHolder.get_z()]
 
         BasePointOne = np.subtract(pointRotation, origin)
         BasePointTwo = np.subtract(sphericalOrigin, origin)
 
         # Rotation Angle about Z Axis
         gamma = 2*pi - atan(BasePointOne[1]/BasePointOne[0])
-
-        self.sphericalHolderCoords = []
         
-        for i in range(1, int((max-min)/interval + 1)+1):
-            theta = (min + (i*interval))*pi/180
+        for i in range(1, int((_max-_min)/interval + 1)+1):
+            theta = (_min + (i*interval))*pi/180
 
             # Translate Point 1 to Origin(T)
             pointOne = BasePointOne
@@ -94,7 +114,6 @@ class PickupLocations:
             self.sphericalHolderCoords.append(condensedTwo)
             MAG = [self.sphericalHolderCoords[-1][0] - pointRotation[0], self.sphericalHolderCoords[-1][1] - pointRotation[1], self.sphericalHolderCoords[-1][2] - pointRotation[2]]
             MAG = sum([x**2 for x in MAG])**(1/2)
-            
 
-    def calc_SH(self, interval, min, max):
-        self.calculate_spherical_holders(interval, min, max)
+    def get_sphericalHolderCoords(self):
+        return self.sphericalHolderCoords
