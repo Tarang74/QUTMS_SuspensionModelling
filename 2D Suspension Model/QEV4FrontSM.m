@@ -41,7 +41,8 @@ Chassang = (abs(atan((UWY-BWY)/(UWX-BWX)))); %
 
 %%%----------4BarEquations----------%%%
 %%%Relation to wheel travel angle of upper a-arm from +ve x axis
-theta2og=atan((IUSHY-(UWY*sign(UWY)))/(IUSHX-(UWX*sign(UWX))))+(pi/2)+abs(atan((UWX-BWX)/(UWY-BWY))); %
+%theta2og wrong
+theta2og=atan((IUSHY-UWY)/abs(IUSHX-UWX))+(pi/2)+abs(atan((UWX-BWX)/(UWY-BWY)));
 theta_inc=0.25*(pi/180);
 theta_range=5*(pi/180);
 theta2pp=[];
@@ -114,6 +115,7 @@ for j=1:theta_range/theta_inc
     
     TY= BSHY-(((Tyre*2)-(IUSHY-IBSHY))/2);
     
+    %Error in graph is wtrav(21)
     wtrav(j+i) = TY-TYog;
     
     %Calc camber: Angle of USBL from x axis - KPI (Note: -90 doesnt work fix)
