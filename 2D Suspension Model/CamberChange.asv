@@ -24,10 +24,14 @@ clc;clear all; close all;
     RBWY=(RBFWY+RBRWY)/2;
 
     %%%Initial Spherical Holder Position
-    SHcoords = [502.56 298.98; %Front Upper A-arm
-        531.71 104.46; %Front Lower A-arm
-        490.41 298.77; % Rear Upper A-arm
+    SHcoords = [502.56 298.98;
+        531.71 104.46;
+        490.41 298.77; % Rear Upper 
         531.71 104.46]; %Rear Lower A-arm
+    FIUSHX = 502.56; FIUSHY = 298.98; %Front Upper A-arm Front
+    FIBSHX = 531.71; FIBSHY = 104.46; % Front Lower A-arm Front
+    RIUSHX = 490.41; RIUSHY = 298.77; %Rear Upper A-arm Front
+    RIBSHX = 531.71; RIBSHY = 104.46; %Rear Lower A-arm Front
 
     %%%King Pin Inclination Rear & Front
     fKPI = 7.5;
