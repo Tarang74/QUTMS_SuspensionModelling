@@ -1,5 +1,5 @@
 %Prep
-clc;clear all; close all;
+% clc;clear all; close all;
 
 %% Variables
     %%%A-arm coords (x,y) relative to chassis origin (Fixed points to
@@ -24,7 +24,7 @@ clc;clear all; close all;
     RBWY=(RBFWY+RBRWY)/2;
 
     %%%Initial Spherical Holder Position
-    SHcoords = [502.56 298.98; %Front Upper A-arm
+    SHCoords = [502.56 298.98; %Front Upper A-arm
         531.71 104.46; %Front Lower A-arm
         490.41 298.77; % Rear Upper A-arm
         531.71 104.46]; %Rear Lower A-arm
@@ -40,11 +40,11 @@ clc;clear all; close all;
 %% LengthsofLinks
 %%%Front Suspension
 %%%Upper Front A-arm Link (c)
-FUWL = sqrt((FIUSHX-FUWX)^2+(FIUSHY-FUWY)^2);
+FUWL = sqrt((SHCoords(1, 1)-FUWX)^2+(SHCoords(1,2)-FUWY)^2);
 %%%Lower Front A-arm Link (a)
-FBWL = sqrt((FIBSHX-FBWX)^2+(FIBSHY-FBWY)^2);
+FBWL = sqrt((SHCoords(2,1)-FBWX)^2+(SHCoords(2,2)-FBWY)^2);
 %%%Upper Spherical to Lower Spherical (b)
-FUSBSL = sqrt((FIUSHX-FIBSHX)^2+(FIUSHY-FIBSHY)^2);
+FUSBSL = sqrt((SHCoords(1,1)-SHCoords(2,1))^2+(SHCoords(1,2)-SHCoords(2,2))^2);
 %%%Upper Chassis Point to Lower Chassis Point (d)
 FUCBCL = sqrt((FUWX-FBWX)^2+(((FUWY-FBWY)^2)));
 
@@ -54,7 +54,7 @@ Chassang = (abs(atan((FUWY-FBWY)/(FUWX-FBWX))));
 %% 4BarEquations
 %%%Relation to wheel travel angle of upper a-arm from +ve x axis
 %theta2og wrong
-theta2og=atan((FIUSHY-FUWY)/abs(FIUSHX-FUWX))+(pi/2)+abs(atan((FUWX-FBWX)/(FUWY-FBWY)));
+theta2og=atan((SHCoords(1,2)-FUWY)/abs(SHCoords(1,1)-FUWX))+(pi/2)+abs(atan((FUWX-FBWX)/(FUWY-FBWY)));
 theta_inc=0.25*(pi/180);
 theta_range=5*(pi/180);
 theta2pp=[];
