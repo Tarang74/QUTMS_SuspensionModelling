@@ -33,6 +33,7 @@
     fKPI = 7.5;
     rKPI = 11;
     %%%Tyre Diametre (Rideheight)
+    
     Tyre = 203.2;
     %Distance of Tyre from spherical holder (mm)
     Tyredist = 260; %Distance of chassis body to wheel
