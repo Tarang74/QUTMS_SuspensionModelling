@@ -1,5 +1,5 @@
 %Prep
-% clc;clear all; close all;
+clc;clear all; close all;
 
 %% Variables
     %%%A-arm coords (x,y) relative to chassis origin (Fixed points to
